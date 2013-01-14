@@ -28,11 +28,11 @@ define([], function() {
     if (this.trackingOff()) {
       return;
     }
-    console.log('<PAGE>', page);
     var page = window.location.pathname + window.location.hash;
+    console.log('<PAGE>', page);
     var referrer = document.referrer;
     // kissmetrics page tracking
-    _kmq.push(['record', 'Page Visit', {'Viewed URL':page, 'Referrer':referrer}]);
+    // _kmq.push(['record', 'Page Visit', {'Viewed URL':page, 'Referrer':referrer}]);
     // google analytics page tracking
     _gaq.push(['_trackPageview', page]);
     // mixpanel
@@ -49,7 +49,7 @@ define([], function() {
     properties = properties || {};
     properties['Viewed URL'] = page;
     //kissmetrics
-    _kmq.push(['record', eventCategory+' - '+eventName, properties]);
+    // _kmq.push(['record', eventCategory+' - '+eventName, properties]);
     //google analytics
     _gaq.push(['_trackEvent', eventCategory, eventName, page]);
     //mixpanel
