@@ -1,4 +1,4 @@
-define('track', [], function() {
+define([], function() {
   var Track = function(){
     this.userTracked = false;
   };
