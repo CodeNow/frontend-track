@@ -13,8 +13,6 @@ define([], function() {
     }
     if (!this.userTracked) { // dont push identification to services multiple times..
       this.userTracked = true;
-      //kissmetrics
-      _kmq.push(['identify', userId]);
       //google analytics
       ////na
       //mixpanel
