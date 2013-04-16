@@ -66,5 +66,9 @@ define([], function() {
     hideSurvey();
   };
 
+  Track.prototype.increment = function () {
+    mixpanel.people.increment.apply(mixpanel.increment, arguments);
+  };
+
   return new Track();
 });
