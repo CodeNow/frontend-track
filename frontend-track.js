@@ -67,6 +67,10 @@ define([], function() {
     hideSurvey();
   };
 
+  Track.prototype.increment = function () {
+    mixpanel.people.increment.apply(mixpanel.increment, arguments);
+  };
+
   function isChannel () {
     // brittle, but should work for now
     return !!$('.tab').map(function () {
