@@ -44,6 +44,7 @@ define([], function() {
     console.log('<EVENT>', eventCategory, eventName);
     properties = properties || {};
     properties['Viewed URL'] = page;
+    properties['isChannel'] = isChannel();
     //google analytics
     _gaq.push(['_trackEvent', eventCategory, eventName, page]);
     //mixpanel
@@ -66,9 +67,14 @@ define([], function() {
     hideSurvey();
   };
 
-  Track.prototype.increment = function () {
-    mixpanel.people.increment.apply(mixpanel.increment, arguments);
-  };
+  function isChannel () {
+    // brittle, but should work for now
+    return !!$('.tab').map(function () {
+      return $(this).data('pane');
+    }).filter(function (i, pane) {
+      return pane === '.related-pane'
+    }).length;
+  }
 
   return new Track();
 });
