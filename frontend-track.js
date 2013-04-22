@@ -68,7 +68,7 @@ define([], function() {
   };
 
   Track.prototype.increment = function () {
-    mixpanel.people.increment.apply(mixpanel.increment, arguments);
+    // mixpanel.people.increment.apply(mixpanel.increment, arguments);
   };
 
   function isChannel () {
