@@ -1,6 +1,23 @@
 define([], function() {
   var Track = function(){
     this.userTracked = false;
+    this.trackQualarooEvents();
+  };
+
+  Track.prototype.trackQualarooEvents = function () {
+    if (this.trackingOff()) return;
+    var self = this;
+    _kiq.push(['eventHandler', 'submit', function(data){
+      if (data && data.current_fields) {
+        data.current_fields.forEach(function (survey) {
+          var surveyOptions = { question:survey.question };
+          for (var key in survey.answer) {
+            surveyOptions['answer_'+key] = survey.answer[key];
+          }
+          self.event('Qualaroo', 'Survey Answered', surveyOptions);
+        });
+      }
+    }]);
   };
 
   Track.prototype.trackingOff = function() {
