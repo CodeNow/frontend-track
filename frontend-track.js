@@ -39,6 +39,10 @@ define([], function() {
     }
   };
 
+  Track.prototype.userInfo = function (obj) {
+    mixpanel.people.set(obj);
+  };
+
   Track.prototype.pageView = function() {
     if (this.trackingOff()) {
       return;
