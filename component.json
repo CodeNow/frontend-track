@@ -1,6 +1,6 @@
 {
   "name": "frontend-track",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "main": "frontend-track.js",
   "dependencies": {
   }

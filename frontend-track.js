@@ -41,6 +41,9 @@ define([], function() {
 
   Track.prototype.userInfo = function (obj) {
     mixpanel.people.set(obj);
+    if (obj.$email != null) { // not null or undefined
+      mixpanel.name_tag(obj.$email);
+    }
   };
 
   Track.prototype.pageView = function() {
