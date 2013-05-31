@@ -43,6 +43,7 @@ define([], function() {
     mixpanel.people.set(obj);
     if (obj.$email != null) { // not null or undefined
       mixpanel.name_tag(obj.$email);
+      this.user(obj.$email);
     }
   };
 
