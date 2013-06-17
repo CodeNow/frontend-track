@@ -1,4 +1,4 @@
-define([], function() {
+;(function (global) {
   var Track = function(){
     this.userTracked = false;
     this.trackQualarooEvents();
@@ -101,9 +101,22 @@ define([], function() {
     return !!$('.tab').map(function () {
       return $(this).data('pane');
     }).filter(function (i, pane) {
-      return pane === '.related-pane'
+      return pane === '.related-pane';
     }).length;
   }
 
-  return new Track();
-});
+  if (global.define) {
+    define([], function() {
+      return new Track();
+    });
+  }
+  else if (global.module) {
+    module.exports = new Track();
+  }
+  else if (global.exports) {
+    exports = new Track();
+  }
+  else {
+    global.Track = new Track();
+  }
+})(this);
