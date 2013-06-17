@@ -119,4 +119,4 @@
   else {
     global.Track = new Track();
   }
-})(this);
+})(window);
