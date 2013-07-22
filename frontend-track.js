@@ -35,7 +35,8 @@
       //mixpanel
       mixpanel.identify(userId);
       //qualaroo
-      _kiq.push(['identify', userId]);
+      if (_kiq)
+        _kiq.push(['identify', userId]);
     }
   };
 
@@ -66,10 +67,10 @@
       return;
     }
     var page = window.location.pathname + window.location.hash;
-    console.log('<EVENT>', eventCategory, eventName);
     properties = properties || {};
     properties['Viewed URL'] = page;
-    properties['isChannel'] = isChannel();
+    //console
+    console.log('<EVENT>', eventCategory, '-', eventName, properties);
     //google analytics
     _gaq.push(['_trackEvent', eventCategory, eventName, page]);
     //mixpanel
@@ -96,14 +97,6 @@
     mixpanel.people.increment.apply(mixpanel.people, arguments);
   };
 
-  function isChannel () {
-    // brittle, but should work for now
-    return !!$('.tab').map(function () {
-      return $(this).data('pane');
-    }).filter(function (i, pane) {
-      return pane === '.related-pane';
-    }).length;
-  }
 
   if (global.define) {
     define([], function() {
