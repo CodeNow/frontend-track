@@ -48,6 +48,32 @@
     }
   };
 
+  Track.prototype.backboneRequestError = function (modelOrCollections, xhr, options) {
+    var opts = {};
+    if (options) {
+      opts.url = options.url.replace('/api/-/', '/');
+    }
+    if (xhr) {
+      opts.responseText = xhr.responseText;
+      opts.status = xhr.status;
+    }
+    var model, collection;
+    if (modelOrCollection instanceof Backbone.Model) {
+      model = modelOrCollection
+      opts.modelName = model.constructor.id;
+      opts.modelId   = model.id;
+    }
+    else if (modelOrCollection instanceof Backbone.Collection) {
+      collection = modelOrCollection;
+      opts.collectionName = collection.constructor.id;
+      opts.collectionParams = JSON.stringify(collection.params);
+    }
+    for (var key in opts) { // if opts is not empty
+      this.event('Error', 'ResponseError', opts);
+      break;
+    }
+  };
+
   Track.prototype.pageView = function() {
     if (this.trackingOff()) {
       return;
