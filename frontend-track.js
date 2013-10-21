@@ -48,7 +48,7 @@
     }
   };
 
-  Track.prototype.backboneRequestError = function (modelOrCollections, xhr, options) {
+  Track.prototype.backboneRequestError = function (modelOrCollection, xhr, options) {
     var opts = {};
     if (options) {
       opts.url = options.url.replace('/api/-/', '/');
