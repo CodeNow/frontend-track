@@ -1,7 +1,49 @@
 ;(function (global) {
+  function warnMissing (name) {
+    return function () {
+      console.log('warn: '+name+' missing');
+    };
+  }
+
+  function extend (o1, o2) {
+    for (var key in o2) {
+      if (o2.hasOwnProperty(key)) {
+        o1[key] = o2[key]
+      }
+    }
+    return o1;
+  }
+
+  function merge (o1, o2) {
+    var out = {};
+    extend(out, o1);
+    extend(out, o2);
+
+    return out;
+  }
+
   var Track = function(){
     this.userTracked = false;
+    if (!window._gaq) {
+      window._gaq = warnMissing('googleanalytics');
+      window._gaq.push = warnMissing('googleanalytics');
+      window._gaq();
+    }
+    if (!window._kiq) {
+      window._kiq = warnMissing('qualaroo');
+      window._kiq.push = warnMissing('qualaroo');
+      window._kiq();
+    }
+    if (!window.olark) {
+      window.olark = warnMissing('olark');
+      window.olark();
+    }
+    if (!window.mixpanel) {
+      window.mixpanel = warnMissing('mixpanel');
+      window.mixpanel();
+    }
     this.trackQualarooEvents();
+    this.attachOlarkEvents();
   };
 
   Track.prototype.trackQualarooEvents = function () {
@@ -20,31 +62,91 @@
     }]);
   };
 
+  Track.prototype.attachOlarkEvents = function () {
+    olark('api.chat.onBeginConversation', function() {
+      olark('api.chat.sendNotificationToOperator', { body: JSON.stringify(this._userInfo) });
+    });
+  };
+
   Track.prototype.trackingOff = function() {
     return ($.getQuery && $.getQuery('track') == 'off');
   },
 
-  Track.prototype.user = function(userId) {
-    if (this.trackingOff()) {
-      return;
-    }
+  Track.prototype.user = function (user) {
+    if (this.trackingOff()) return;
+    mixpanel.people.set(user);
+
+    if (user._id) this.setUserId(user._id, user.email);
+    if (user.email) this.setEmail(user.email);
+
+    olark('api.visitor.updateCustomFields', user);
+    this.initIntercom(user);
+    this._userInfo = user;
+  };
+
+  Track.prototype.setUserId = function (userId, email) {
     if (!this.userTracked) { // dont push identification to services multiple times..
       this.userTracked = true;
       //google analytics
       ////na
       //mixpanel
+      mixpanel.alias(userId);
       mixpanel.identify(userId);
       //qualaroo
-      if (_kiq)
-        _kiq.push(['identify', userId]);
+      _kiq.push(['identify', email || userId]);
     }
   };
 
-  Track.prototype.userInfo = function (obj) {
-    mixpanel.people.set(obj);
-    if (obj.$email != null) { // not null or undefined
-      mixpanel.name_tag(obj.$email);
-      this.user(obj.$email);
+  Track.prototype.setEmail = function (email) {
+    mixpanel.name_tag(email);
+    olark('api.visitor.updateEmailAddress', {emailAddress:email});
+  };
+
+  Track.prototype.initIntercom = function (user) {
+    if (!user.permission_level || user.permission_level < 1) {
+      console.log('no intercom');
+      return;
+    }
+    console.log('added intercom');
+
+    window.intercomSettings = merge(window.CONFIG.intercom, user);
+    intercomSettings.user_id = user._id;
+    if (user.created) {
+      intercomSettings.created_at = Date.parse(user.created)/1000; // unix
+    }
+
+    // intercom script
+    var w = window;
+    var ic = w.Intercom;
+    if (typeof ic === "function") {
+      ic('reattach_activator');
+      ic('update', intercomSettings);
+    } else {
+      var d = document;
+      var i = function() {
+        i.c(arguments)
+      };
+      i.q = [];
+      i.c = function(args) {
+        i.q.push(args)
+      };
+      w.Intercom = i;
+
+      function l() {
+        var s = d.createElement('script');
+        s.type = 'text/javascript';
+        s.async = true;
+        s.src = 'https://static.intercomcdn.com/intercom.v1.js';
+        var x = d.getElementsByTagName('script')[0];
+        x.parentNode.insertBefore(s, x);
+      }
+      // MODIFIED BELOW
+      // if (w.attachEvent) {
+      //   w.attachEvent('onload', l);
+      // } else {
+      //   w.addEventListener('load', l, false);
+      // }
+      l();
     }
   };
 
