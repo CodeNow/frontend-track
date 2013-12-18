@@ -16,10 +16,14 @@
 
   function merge (o1, o2) {
     var out = {};
-    extend(out, o1);
-    extend(out, o2);
+    extend(out, o1 || {});
+    extend(out, o2 || {});
 
     return out;
+  }
+
+  function clone (o1) {
+    return extend({}, o1);
   }
 
   var Track = function(){
@@ -74,10 +78,18 @@
 
   Track.prototype.user = function (user) {
     if (this.trackingOff()) return;
-    mixpanel.people.set(user);
+
+    var mixpanelUser = clone(user);
+    mixpanelUser.$email = user.email
+    mixpanelUser.$created = user.created;
+    mixpanelUser.$name = user.username;
+    mixpanel.people.set(mixpanelUser);
 
     if (user._id) this.setUserId(user._id, user.email);
-    if (user.email) this.setEmail(user.email);
+    if (user.email) {
+      this.setEmail(user.email, user.username);
+      this.setNickname(user);
+    }
 
     olark('api.visitor.updateCustomFields', user);
     this.initIntercom(user);
@@ -98,8 +110,13 @@
   };
 
   Track.prototype.setEmail = function (email) {
-    mixpanel.name_tag(email);
+    // mixpanel.people.set({$email:email}); set in user method
     olark('api.visitor.updateEmailAddress', {emailAddress:email});
+  };
+
+  Track.prototype.setNickname = function (user) {
+    // mixpanel.people.set({$name:user.username}); set in user method
+    mixpanel.name_tag(user.username || user.email);
   };
 
   Track.prototype.initIntercom = function (user) {
@@ -111,6 +128,7 @@
 
     window.intercomSettings = merge(window.CONFIG.intercom, user);
     intercomSettings.user_id = user._id;
+    intercomSettings.name = user.username;
     if (user.created) {
       intercomSettings.created_at = Date.parse(user.created)/1000; // unix
     }
