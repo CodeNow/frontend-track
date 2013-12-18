@@ -81,7 +81,7 @@
 
     var mixpanelUser = clone(user);
     mixpanelUser.$email = user.email
-    mixpanelUser.$created = user.created;
+    mixpanelUser.$created = new Date(user.created);
     mixpanelUser.$name = user.username;
     mixpanel.people.set(mixpanelUser);
 
