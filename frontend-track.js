@@ -129,6 +129,9 @@
     window.intercomSettings = merge(window.CONFIG.intercom, user);
     intercomSettings.user_id = user._id;
     intercomSettings.name = user.username;
+    if (user.email) {
+      intercomSettings.analyzerLink = 'http://runnable1.net:8083?email='+user.email;
+    }
     if (user.created) {
       intercomSettings.created_at = Date.parse(user.created)/1000; // unix
     }
