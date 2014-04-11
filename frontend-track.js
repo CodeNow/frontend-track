@@ -120,7 +120,9 @@
   };
 
   Track.prototype.initIntercom = function (user) {
-    if (!user.permission_level || user.permission_level < 1) {
+    var lastUrlPart = (window.location.pathname.split('/').pop() || '').toLowerCase();
+
+    if (!user.permission_level || user.permission_level < 1 || lastUrlPart === 'embedded') {
       console.log('no intercom');
       return;
     }
