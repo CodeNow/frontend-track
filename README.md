@@ -1,2 +1,2 @@
-+# frontend-track
-+Frontend tracking module
+# frontend-track
+Frontend tracking module
